@@ -9,6 +9,8 @@
 
     The boundary value (default 32,503,680,000) is used to distinguish 10-digit second timestamps from
     13-digit millisecond timestamps. Values greater than the boundary are treated as milliseconds.
+    The default boundary corresponds to Wednesday, 1 January 3000 00:00:00 UTC expressed as a Unix
+    seconds timestamp — safely beyond any real-world seconds timestamp in current use.
 #>
 
 Set-StrictMode -Version Latest
@@ -23,7 +25,7 @@ function ConvertFrom-UnixTimestamp {
     .DESCRIPTION
         Accepts a Unix epoch timestamp as either a 10-digit (seconds) or 13-digit (milliseconds) value.
         The distinction is made by comparing the timestamp against a boundary value (default: 32,503,680,000,
-        which represents 2001-01-01T00:00:00Z in seconds but more usefully represents the year 3000 in seconds).
+        which corresponds to Wednesday, 1 January 3000 00:00:00 UTC as a Unix seconds timestamp).
 
         The boundary value can be overridden via the -BoundaryValue parameter or the
         UNIX_TIMESTAMP_BOUNDARY environment variable.
@@ -173,8 +175,6 @@ function ConvertTo-UnixTimestamp {
     )
 
     process {
-        $epoch = [System.DateTimeOffset]::new(1970, 1, 1, 0, 0, 0, [System.TimeSpan]::Zero)
-
         switch ($PSCmdlet.ParameterSetName) {
             'FromDateTime' {
                 # Treat DateTime as UTC regardless of its Kind
@@ -192,7 +192,7 @@ function ConvertTo-UnixTimestamp {
             }
         }
 
-        $totalMs      = [long] ($dto - $epoch).TotalMilliseconds
+        $totalMs      = $dto.ToUnixTimeMilliseconds()
         $totalSeconds = [Math]::DivRem($totalMs, 1000L, [ref] $null)
 
         [PSCustomObject] @{
@@ -231,8 +231,6 @@ function ConvertStringToDateTimeOffset {
         [string] $Value,
         [string] $Format
     )
-
-    $utcOffset = [System.TimeSpan]::Zero
 
     if (-not [string]::IsNullOrWhiteSpace($Format)) {
         # ParseExact requires a specific format; assume UTC offset
