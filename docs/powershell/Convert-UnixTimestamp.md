@@ -11,59 +11,81 @@ A PowerShell module providing two functions for working with Unix epoch timestam
 
 ## Installation
 
-### 1. Copy the module files
+### Quick install (one-liner)
 
-Clone or download the repository and locate the `powershell/` directory.
+No need to clone the repository or copy files manually. Open a PowerShell terminal and run one of the commands below.
 
-```powershell
-# Example: copy to your personal PowerShell modules directory
-$destination = Join-Path ([System.Environment]::GetFolderPath('MyDocuments')) 'PowerShell' 'Modules' 'Convert-UnixTimestamp'
-Copy-Item -Path '<repo-path>/powershell/' -Destination $destination -Recurse
-```
-
-On **Linux/macOS** the personal modules directory is typically:
-
-```
-~/.local/share/powershell/Modules/Convert-UnixTimestamp/
-```
-
-On **Windows** it is typically:
-
-```
-C:\Users\<YourName>\Documents\PowerShell\Modules\Convert-UnixTimestamp\
-```
-
-### 2. Import the module in your PowerShell profile
-
-Open (or create) your PowerShell profile:
+**Install module files only** (you can then `Import-Module` in each session, or add it to your profile manually):
 
 ```powershell
-# Check whether a profile file already exists
-Test-Path $PROFILE
-
-# Create it if it does not exist
-if (-not (Test-Path $PROFILE)) {
-    New-Item -ItemType File -Path $PROFILE -Force
-}
-
-# Open the profile in your default editor
-notepad $PROFILE          # Windows
-code $PROFILE             # VS Code (any platform)
+irm https://raw.githubusercontent.com/steve-codemunkies/convert-ts/main/powershell/install.ps1 | iex
 ```
 
-Add the following line to your profile:
+**Install and automatically add to your PowerShell profile** (functions available in every new session):
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/steve-codemunkies/convert-ts/main/powershell/install.ps1))) -AddToProfile
+```
+
+After installing, load the module in your current session:
 
 ```powershell
 Import-Module Convert-UnixTimestamp
 ```
 
-If you placed the module in a non-standard location, provide the full path to the manifest instead:
+> **Note — execution policy**: if PowerShell reports a security error about running scripts, you may need to allow remote-signed scripts for the current user first:
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
 
-```powershell
-Import-Module 'C:\path\to\powershell\Convert-UnixTimestamp.psd1'
+---
+
+### Manual installation (alternative)
+
+If you prefer not to run a remote script, follow these steps instead.
+
+#### 1. Copy the module files
+
+Download the two module files and place them in a folder named `Convert-UnixTimestamp` inside your personal PowerShell modules directory.
+
+On **Windows** the personal modules directory is typically:
+
+```
+C:\Users\<YourName>\Documents\PowerShell\Modules\Convert-UnixTimestamp\
 ```
 
-### 3. Verify the installation
+On **Linux/macOS** it is typically:
+
+```
+~/.local/share/powershell/Modules/Convert-UnixTimestamp/
+```
+
+Files to download:
+
+- [`Convert-UnixTimestamp.psd1`](https://raw.githubusercontent.com/steve-codemunkies/convert-ts/main/powershell/Convert-UnixTimestamp.psd1)
+- [`Convert-UnixTimestamp.psm1`](https://raw.githubusercontent.com/steve-codemunkies/convert-ts/main/powershell/Convert-UnixTimestamp.psm1)
+
+Or, using PowerShell:
+
+```powershell
+$dest = Join-Path ([System.Environment]::GetFolderPath('MyDocuments')) 'PowerShell' 'Modules' 'Convert-UnixTimestamp'
+New-Item -ItemType Directory -Path $dest -Force | Out-Null
+$base = 'https://raw.githubusercontent.com/steve-codemunkies/convert-ts/main/powershell'
+Invoke-WebRequest "$base/Convert-UnixTimestamp.psd1" -OutFile (Join-Path $dest 'Convert-UnixTimestamp.psd1') -UseBasicParsing
+Invoke-WebRequest "$base/Convert-UnixTimestamp.psm1" -OutFile (Join-Path $dest 'Convert-UnixTimestamp.psm1') -UseBasicParsing
+```
+
+#### 2. Import the module in your PowerShell profile
+
+Add the following line to your `$PROFILE` so the module loads automatically in every new session:
+
+```powershell
+# Open (or create) your profile
+if (-not (Test-Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force }
+Add-Content -Path $PROFILE -Value "`nImport-Module Convert-UnixTimestamp"
+```
+
+#### 3. Verify the installation
 
 ```powershell
 Get-Command -Module Convert-UnixTimestamp
@@ -286,6 +308,12 @@ The module ships with a [Pester](https://pester.dev/) v5 test suite.
 # Install Pester v5 if not already installed
 Install-Module Pester -Force -SkipPublisherCheck
 
-# Run the tests from the repository root
+# Run the tests directly from GitHub (no clone required)
+$testUrl = 'https://raw.githubusercontent.com/steve-codemunkies/convert-ts/main/powershell/Tests/Convert-UnixTimestamp.Tests.ps1'
+$tmp = New-TemporaryFile | Rename-Item -NewName { $_.Name -replace '\.tmp$', '.Tests.ps1' } -PassThru
+Invoke-WebRequest $testUrl -OutFile $tmp.FullName -UseBasicParsing
+Invoke-Pester -Path $tmp.FullName -Output Detailed
+
+# Or, if you have the repository cloned locally, run from the repo root:
 Invoke-Pester -Path './powershell/Tests/Convert-UnixTimestamp.Tests.ps1' -Output Detailed
 ```
