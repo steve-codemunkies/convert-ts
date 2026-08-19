@@ -2,7 +2,13 @@ name: Pester Tests
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - 'powershell/**'
   pull_request:
+    paths:
+      - 'powershell/**'
 
 jobs:
   test:
