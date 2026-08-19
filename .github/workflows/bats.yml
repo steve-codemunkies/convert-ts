@@ -1,0 +1,39 @@
+name: Bats Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'bash/**'
+  pull_request:
+    paths:
+      - 'bash/**'
+
+jobs:
+  test:
+    name: Run Bats Tests
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install bats
+        run: sudo apt-get install -y bats
+
+      - name: Run tests
+        run: bats --formatter junit bash/tests/convert-ts.bats > test-results.xml; bats bash/tests/convert-ts.bats
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: test-results.xml
