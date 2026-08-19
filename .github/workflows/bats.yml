@@ -14,6 +14,8 @@ jobs:
   test:
     name: Run Bats Tests
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
