@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ConvertTs (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "ConvertTs (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
