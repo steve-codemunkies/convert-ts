@@ -29,8 +29,18 @@ public static class UnixTimestampConverter
             milliseconds = seconds * 1000L;
         }
 
-        utc = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
-        return true;
+        try
+        {
+            utc = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
+            return true;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            utc = default;
+            seconds = 0;
+            milliseconds = 0;
+            return false;
+        }
     }
 
     public static bool TryConvertToTimestamp(string input, out DateTimeOffset utc, out long seconds, out long milliseconds)
@@ -44,9 +54,19 @@ public static class UnixTimestampConverter
             return false;
         }
 
-        milliseconds = utc.ToUnixTimeMilliseconds();
-        seconds = milliseconds / 1000L;
-        return true;
+        try
+        {
+            milliseconds = utc.ToUnixTimeMilliseconds();
+            seconds = milliseconds / 1000L;
+            return true;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            utc = default;
+            seconds = 0;
+            milliseconds = 0;
+            return false;
+        }
     }
 
     public static void GetNowTimestamps(out DateTimeOffset utc, out long seconds, out long milliseconds)

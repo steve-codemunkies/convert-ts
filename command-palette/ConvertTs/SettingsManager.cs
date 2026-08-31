@@ -5,13 +5,11 @@ namespace ConvertTs;
 
 internal sealed partial class SettingsManager : JsonSettingsManager
 {
-    private static readonly string _namespace = "ConvertTs.CommandPalette";
-
-    private static string Namespaced(string propertyName) => $"{_namespace}.{propertyName}";
+    private const string Namespace = "ConvertTs.CommandPalette";
 
     internal static string SettingsJsonPath()
     {
-        var directory = Microsoft.CommandPalette.Extensions.Toolkit.Utilities.BaseSettingsPath(_namespace);
+        var directory = Microsoft.CommandPalette.Extensions.Toolkit.Utilities.BaseSettingsPath(Namespace);
         Directory.CreateDirectory(directory);
 
         return Path.Combine(directory, "settings.json");

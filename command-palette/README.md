@@ -17,8 +17,8 @@ The first version is UTC-only.
 
 ## Project layout
 
-- `ConvertTs.CommandPalette/` — the PowerToys Command Palette extension project
-- `ConvertTs.CommandPalette.Tests/` — helper-focused unit tests for the shared converter logic
+- `ConvertTs/` — the PowerToys Command Palette extension project
+- `ConvertTs.Tests/` — helper-focused unit tests for the shared converter logic
 
 ## Prerequisites
 

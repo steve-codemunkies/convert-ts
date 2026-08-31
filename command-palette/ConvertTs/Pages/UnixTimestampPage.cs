@@ -9,7 +9,7 @@ namespace ConvertTs.Pages;
 
 internal sealed partial class UnixTimestampPage : DynamicListPage
 {
-    private const string UtcDisplayFormat = "yyyy-MM-ddTHH:mm:ss'Z'";
+    private const string UtcDisplayFormat = "yyyy-MM-ddTHH:mm:ss.fff'Z'";
 
     private string _query = string.Empty;
 
