@@ -1,8 +1,8 @@
 using System;
-using ConvertTs.CommandPalette.Utilities;
 using Xunit;
+using ConvertTs.Utilities;
 
-namespace ConvertTs.CommandPalette.Tests;
+namespace ConvertTs.Tests.Utilities;
 
 public class UnixTimestampConverterTests
 {

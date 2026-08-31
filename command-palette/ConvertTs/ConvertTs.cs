@@ -9,7 +9,7 @@ using Microsoft.CommandPalette.Extensions;
 
 namespace ConvertTs;
 
-[Guid("7a00944f-69bb-4750-886d-679d0d73c355")]
+[Guid("68905d7b-3ef9-439f-b130-072956c8aaeb")]
 public sealed partial class ConvertTs : IExtension, IDisposable
 {
     private readonly ManualResetEvent _extensionDisposedEvent;

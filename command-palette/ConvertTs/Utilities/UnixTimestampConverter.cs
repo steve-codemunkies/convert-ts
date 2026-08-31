@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 namespace ConvertTs.Utilities;
 
-internal static class UnixTimestampConverter
+public static class UnixTimestampConverter
 {
     public const long DefaultBoundaryValue = 32503680000L;
 

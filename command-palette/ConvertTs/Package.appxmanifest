@@ -47,7 +47,7 @@
         <com:Extension Category="windows.comServer">
           <com:ComServer>
             <com:ExeServer Executable="ConvertTs.exe" Arguments="-RegisterProcessAsComServer" DisplayName="convert-ts">
-              <com:Class Id="7a00944f-69bb-4750-886d-679d0d73c355" DisplayName="convert-ts" />
+              <com:Class Id="68905d7b-3ef9-439f-b130-072956c8aaeb" DisplayName="convert-ts" />
             </com:ExeServer>
           </com:ComServer>
         </com:Extension>
@@ -60,7 +60,7 @@
             <uap3:Properties>
               <CmdPalProvider>
                 <Activation>
-                  <CreateInstance ClassId="7a00944f-69bb-4750-886d-679d0d73c355" />
+                  <CreateInstance ClassId="68905d7b-3ef9-439f-b130-072956c8aaeb" />
                 </Activation>
                 <SupportedInterfaces>
                   <Commands/>

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace ConvertTs;
