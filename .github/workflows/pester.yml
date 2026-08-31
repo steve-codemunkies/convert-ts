@@ -1,6 +1,7 @@
 name: Pester Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
