@@ -88,6 +88,19 @@ SCRIPT="${SCRIPT_DIR}/convert-ts.sh"
     [ "$output" = "2023-11-14T22:13:20Z" ]
 }
 
+@test "sourcing convert-ts.sh does not enable strict shell options in the caller" {
+    run bash -c "
+        set +e
+        set +u
+        set +o pipefail
+        source '${SCRIPT}'
+        [ \"\$(set -o | awk '\$1 == \"errexit\" { print \$2 }')\" = off ]
+        [ \"\$(set -o | awk '\$1 == \"nounset\" { print \$2 }')\" = off ]
+        [ \"\$(set -o | awk '\$1 == \"pipefail\" { print \$2 }')\" = off ]
+    "
+    [ "$status" -eq 0 ]
+}
+
 @test "convertfrom_unixtimestamp: missing argument prints error and returns non-zero" {
     run bash -c "source '${SCRIPT}'; convertfrom_unixtimestamp"
     [ "$status" -ne 0 ]
