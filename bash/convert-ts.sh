@@ -16,8 +16,6 @@
 #   The script detects which date implementation is available and adjusts
 #   its behaviour accordingly.  See the _convert_ts_date_parse helper below.
 
-set -euo pipefail
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -264,6 +262,8 @@ convertto_unixtimestamp() {
 # When this file is executed (not sourced), dispatch to the right function.
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -euo pipefail
+
     if [[ $# -lt 1 ]]; then
         echo "Usage: $(basename "$0") from|to [options] <value>" >&2
         exit 1
