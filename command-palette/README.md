@@ -2,6 +2,9 @@
 
 This folder contains the initial PowerToys Command Palette extension for converting Unix epoch timestamps.
 
+> {!TIP}
+> In order to be able to run the built extension locally you must [enable Developer Mode in Windows Settings](https://learn.microsoft.com/en-us/windows/advanced-settings/developer-mode)
+
 ## What it does
 
 The extension mirrors the behavior of the existing PowerShell and Bash scripts in this repository:
