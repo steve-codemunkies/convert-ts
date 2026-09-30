@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using ConvertTs.Utilities;
 using Xunit;
 
 namespace ConvertTs.Tests;
@@ -27,7 +28,7 @@ public class SettingsManagerTests : IDisposable
     {
         var settingsManager = new SettingsManager(_filePath);
 
-        Assert.Equal(Utilities.UnixTimestampConverter.DefaultBoundaryValue, settingsManager.BoundaryValue);
+        Assert.Equal(UnixTimestampConverter.DefaultBoundaryValue, settingsManager.BoundaryValue);
         Assert.False(settingsManager.UseLocalTimeZone);
         Assert.Equal("UTC", settingsManager.TimeZone.Id);
     }
@@ -59,7 +60,7 @@ public class SettingsManagerTests : IDisposable
 
         settingsManager.Settings.Update(BuildPayload(boundaryValue: "not-a-number"));
 
-        Assert.Equal(Utilities.UnixTimestampConverter.DefaultBoundaryValue, settingsManager.BoundaryValue);
+        Assert.Equal(UnixTimestampConverter.DefaultBoundaryValue, settingsManager.BoundaryValue);
     }
 
     [Fact]
@@ -99,7 +100,7 @@ public class SettingsManagerTests : IDisposable
 
     private static string BuildPayload(string? boundaryValue = null, string? timeZone = null)
     {
-        boundaryValue ??= Utilities.UnixTimestampConverter.DefaultBoundaryValue.ToString(CultureInfo.InvariantCulture);
+        boundaryValue ??= UnixTimestampConverter.DefaultBoundaryValue.ToString(CultureInfo.InvariantCulture);
         timeZone ??= "UTC";
 
         return $$"""
