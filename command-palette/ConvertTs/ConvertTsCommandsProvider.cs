@@ -18,7 +18,7 @@ public partial class ConvertTsCommandsProvider : CommandProvider
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
         _commands =
         [
-            new CommandItem(new Pages.UnixTimestampPage())
+            new CommandItem(new Pages.UnixTimestampPage(_settingsManager))
             {
                 Title = DisplayName,
                 Subtitle = "Convert Unix epoch timestamps",

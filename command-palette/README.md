@@ -10,13 +10,13 @@ This folder contains the initial PowerToys Command Palette extension for convert
 The extension mirrors the behavior of the existing PowerShell and Bash scripts in this repository:
 
 - Detects whether the input is a Unix timestamp or a date/time string
-- Treats values above the default boundary (`32503680000`) as milliseconds
-- Converts timestamp input to UTC date/time output
-- Converts date/time input to both Unix seconds and milliseconds
+- Treats values above a configurable boundary (default `32503680000`) as milliseconds
+- Converts timestamp input to UTC date/time output, plus the configured timezone's local time when it differs from UTC
+- Converts date/time input to both Unix seconds and milliseconds, interpreting inputs without an explicit offset using the configured timezone
 - Shows a live `Now` item with current UTC epoch seconds and milliseconds
 - Adds a Copy action to each result item
 
-The first version is UTC-only.
+The boundary value and timezone are user-configurable — see [Settings](#settings) below.
 
 ## Project layout
 
@@ -104,6 +104,33 @@ Run the helper tests:
 dotnet test .\command-palette\ConvertTs.CommandPalette.Tests\ConvertTs.CommandPalette.Tests.csproj
 ```
 
+## Settings
+
+The extension exposes two configurable settings:
+
+| Setting | Type | Default | Description |
+| ------- | ---- | ------- | ------------ |
+| Millisecond boundary value | Text (integer) | `32503680000` | Bare numeric timestamps greater than this value are treated as milliseconds; otherwise they're treated as seconds. The setting's description live-updates to show the equivalent UTC instant if the entered value were interpreted as seconds, regardless of the timezone setting below, so you can see what date the boundary represents as you type. |
+| Timezone | Choice (dropdown) | `UTC` | Timezone used to interpret date/time text that has no explicit offset (e.g. `2024-03-15 10:00:00`), and to display converted results alongside UTC. Includes a **Use local timezone** option that always tracks the device's current system timezone, plus every timezone known to the operating system (`TimeZoneInfo.GetSystemTimeZones()`). Input that includes an explicit offset or `Z` designator (e.g. `2023-11-14T22:13:20Z`, `2023-11-14T22:13:20+02:00`) always honors that offset, ignoring this setting. |
+
+### Storage
+
+Settings are persisted as JSON via the Command Palette toolkit's `JsonSettingsManager`, in a file at:
+
+```
+%LOCALAPPDATA%\Microsoft\CommandPalette\Settings\ConvertTs.CommandPalette\settings.json
+```
+
+The file is created on first run and updated automatically whenever a setting changes — there is nothing to configure manually.
+
+### Accessing settings
+
+You can open the settings page in any of the following ways:
+
+1. **From the extension's results** — open **convert ts**, clear the search box, and select the **Open settings** item shown alongside the **Now** item.
+2. **From the command's context menu** — open **convert ts**, then use the context menu (or its keyboard shortcut) on the top-level command and choose the settings entry.
+3. **From Command Palette's global settings** — open Command Palette's own **Settings → Extensions** page and select this extension's entry.
+
 ## Expected inputs
 
 Examples of inputs the extension should accept:
@@ -117,9 +144,7 @@ Examples of inputs the extension should accept:
 
 The initial version intentionally leaves room for later additions such as:
 
-- timezone overrides
 - custom input/output formats
-- boundary override settings
 - packaging/distribution guidance
 
 ## Uninstalling from PowerToys Command Palette (local)
