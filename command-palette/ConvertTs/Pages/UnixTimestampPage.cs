@@ -45,6 +45,7 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
         if (string.IsNullOrWhiteSpace(input))
         {
             items.Add(CreateHintItem());
+            items.Add(CreateSettingsItem(_settingsManager));
             return items.ToArray();
         }
 
@@ -131,6 +132,16 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
         {
             Title = "Unix Epoch Converter",
             Subtitle = subtitle,
+        };
+    }
+
+    private static ListItem CreateSettingsItem(SettingsManager settingsManager)
+    {
+        return new ListItem(settingsManager.Settings.SettingsPage)
+        {
+            Title = "Open settings",
+            Subtitle = "Boundary value and timezone",
+            Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png"),
         };
     }
 
