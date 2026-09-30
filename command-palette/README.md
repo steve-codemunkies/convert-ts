@@ -53,7 +53,7 @@ Select version **10.0.26100.0** (Windows 11, version 24H2).
 Build the extension project:
 
 ```powershell
-dotnet build command-palette\ConvertTs\ConvertTs.csproj
+dotnet build command-palette\ConvertTs\ConvertTs.csproj -c Debug /p:Platform=x64
 ```
 
 > Note: the project targets `net10.0-windows10.0.26100.0`. Ensure both the .NET 10 SDK and Windows SDK 10.0.26100.0 are installed before building (see [Prerequisites](#prerequisites)).

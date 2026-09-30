@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Drop shadow for depth effect matching the original composition -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="8" dy="8" stdDeviation="0" flood-color="#111111" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background / Frame Base -->
+  <rect x="100" y="100" width="300" height="300" fill="#F4F4F2" stroke="#1F1F1F" stroke-width="12" filter="url(#shadow)"/>
+
+  <!-- Bauhaus Geometric Grid Elements (Inside Frame) -->
+  <g clip-path="url(#frameClip)">
+    <clipPath id="frameClip">
+      <rect x="100" y="100" width="300" height="300"/>
+    </clipPath>
+    
+    <!-- Yellow top-left square -->
+    <rect x="100" y="100" width="90" height="90" fill="#FED100"/>
+    
+    <!-- Red bottom-right panel accent -->
+    <rect x="350" y="230" width="50" height="170" fill="#E5383B"/>
+
+    <!-- Blue structural grid lines -->
+    <line x1="190" y1="100" x2="190" y2="400" stroke="#3A86EF" stroke-width="6"/>
+    <line x1="100" y1="330" x2="400" y2="330" stroke="#3A86EF" stroke-width="6"/>
+    <line x1="100" y1="190" x2="400" y2="190" stroke="#3A86EF" stroke-width="6"/>
+  </g>
+
+  <!-- Bold Diagonal Bauhaus Bar cutting across -->
+  <polygon points="170,100 200,100 410,310 410,340" fill="#1F1F1F"/>
+
+  <!-- Lower-Left: Calendar Icon (Overlapping Frame) -->
+  <g transform="translate(70, 240)" filter="url(#shadow)">
+    <!-- Calendar Body -->
+    <rect x="0" y="30" width="140" height="170" rx="8" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="10"/>
+    <!-- Calendar Header Bar -->
+    <path d="M 0 38 L 0 65 L 140 65 L 140 38 Z" fill="#1F1F1F"/>
+    <!-- Binding Rings -->
+    <rect x="30" y="12" width="14" height="30" rx="7" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="6"/>
+    <rect x="96" y="12" width="14" height="30" rx="7" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="6"/>
+    <!-- Red Date Box -->
+    <rect x="18" y="78" width="80" height="60" fill="#E5383B"/>
+    <!-- Number '15' -->
+    <text x="29" y="123" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="44" fill="#1F1F1F">15</text>
+    <!-- Calendar Footer Lines -->
+    <line x1="20" y1="158" x2="90" y2="158" stroke="#3A86EF" stroke-width="6" stroke-linecap="round"/>
+    <line x1="20" y1="178" x2="70" y2="178" stroke="#3A86EF" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Upper-Right: Analogue Clock Icon (Overlapping Frame) -->
+  <g transform="translate(250, 60)" filter="url(#shadow)">
+    <!-- Clock Outer Circle -->
+    <circle cx="140" cy="110" r="85" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="12"/>
+    
+    <!-- Clock Hour Ticks -->
+    <g stroke="#3A86EF" stroke-width="7" stroke-linecap="round">
+      <line x1="140" y1="40" x2="140" y2="52"/>
+      <line x1="210" y1="110" x2="198" y2="110"/>
+      <line x1="140" y1="180" x2="140" y2="168"/>
+      <line x1="70" y1="110" x2="82" y2="110"/>
+      <line x1="190" y1="60" x2="182" y2="69"/>
+      <line x1="190" y1="160" x2="182" y2="151"/>
+      <line x1="90" y1="160" x2="98" y2="151"/>
+      <line x1="90" y1="60" x2="98" y2="69"/>
+    </g>
+
+    <!-- Clock Hands -->
+    <!-- Hour Hand (pointing roughly to 10) -->
+    <path d="M 140 110 L 108 92" stroke="#1F1F1F" stroke-width="10" stroke-linecap="round"/>
+    <!-- Minute Hand (pointing to 12 / top right) -->
+    <path d="M 140 110 L 175 62" stroke="#1F1F1F" stroke-width="10" stroke-linecap="round"/>
+    <!-- Center Pin -->
+    <circle cx="140" cy="110" r="9" fill="#E5383B"/>
+  </g>
+</svg>
