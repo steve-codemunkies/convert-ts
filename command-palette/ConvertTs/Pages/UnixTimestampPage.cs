@@ -148,7 +148,7 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
                 millisecondsText,
                 $"**{utcText}** → **{millisecondsText} ms**{FormatZoneSuffix(utc, timeZone)}",
                 utc,
-                milliseconds / 1000L,
+                utc.ToUnixTimeSeconds(),
                 milliseconds,
                 timeZone),
         };
@@ -167,7 +167,7 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
         TimeZoneInfo timeZone,
         string? input = null)
     {
-        var isUtc = string.Equals(timeZone.Id, TimeZoneInfo.Utc.Id, StringComparison.Ordinal);
+        var isUtc = IsUtc(timeZone);
 
         var metadata = new List<IDetailsElement>();
 
@@ -222,11 +222,21 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
 
     private static string FormatZoneSuffix(DateTimeOffset utc, TimeZoneInfo timeZone)
     {
-        if (string.Equals(timeZone.Id, TimeZoneInfo.Utc.Id, StringComparison.Ordinal))
+        if (IsUtc(timeZone))
         {
             return string.Empty;
         }
 
         return $" · {timeZone.Id}: {UnixTimestampConverter.FormatInTimeZone(utc, timeZone)}";
+    }
+
+    /// <summary>
+    /// Determines whether <paramref name="timeZone"/> is semantically equivalent to UTC, either by
+    /// matching the well-known UTC id or by having a zero offset with no daylight-saving adjustments.
+    /// </summary>
+    private static bool IsUtc(TimeZoneInfo timeZone)
+    {
+        return string.Equals(timeZone.Id, TimeZoneInfo.Utc.Id, StringComparison.Ordinal)
+            || (timeZone.BaseUtcOffset == TimeSpan.Zero && !timeZone.SupportsDaylightSavingTime);
     }
 }
