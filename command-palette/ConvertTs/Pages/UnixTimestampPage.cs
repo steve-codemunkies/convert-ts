@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using ConvertTs.Toolkit;
 using ConvertTs.Utilities;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -75,16 +76,20 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
     {
         UnixTimestampConverter.GetNowTimestamps(out var utc, out var seconds, out var milliseconds);
         var millisecondsText = milliseconds.ToString(CultureInfo.InvariantCulture);
+        var utcText = UnixTimestampConverter.FormatUtc(utc);
 
         var item = new ListItem(new NoOpCommand())
         {
             Title = "Now",
-            Subtitle = $"UTC: {UnixTimestampConverter.FormatUtc(utc)}{FormatZoneSuffix(utc, timeZone)} · Seconds: {seconds} · Milliseconds: {milliseconds}",
+            Subtitle = $"UTC: {utcText}{FormatZoneSuffix(utc, timeZone)} · Seconds: {seconds} · Milliseconds: {milliseconds}",
             TextToSuggest = millisecondsText,
-            MoreCommands = [new CommandContextItem(new CopyTextCommand(millisecondsText))],
+            MoreCommands = [
+                new CommandContextItem(new CopyItemCommand(millisecondsText, "Copy Milliseconds")),
+                new CommandContextItem(new CopyItemCommand(utcText, "Copy UTC")),
+            ],
             Details = CreateTimestampDetails(
                 millisecondsText,
-                $"**Now** → **{UnixTimestampConverter.FormatUtc(utc)}**{FormatZoneSuffix(utc, timeZone)}",
+                $"**Now** → **{utcText}**{FormatZoneSuffix(utc, timeZone)}",
                 utc,
                 seconds,
                 milliseconds,
