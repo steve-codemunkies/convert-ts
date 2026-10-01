@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using ConvertTs.Toolkit;
 using ConvertTs.Utilities;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -74,13 +75,25 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
     private static ListItem CreateNowItem(TimeZoneInfo timeZone)
     {
         UnixTimestampConverter.GetNowTimestamps(out var utc, out var seconds, out var milliseconds);
+        var millisecondsText = milliseconds.ToString(CultureInfo.InvariantCulture);
+        var utcText = UnixTimestampConverter.FormatUtc(utc);
 
         var item = new ListItem(new NoOpCommand())
         {
             Title = "Now",
-            Subtitle = $"UTC: {UnixTimestampConverter.FormatUtc(utc)}{FormatZoneSuffix(utc, timeZone)} · Seconds: {seconds} · Milliseconds: {milliseconds}",
-            TextToSuggest = milliseconds.ToString(CultureInfo.InvariantCulture),
-            MoreCommands = [new CommandContextItem(new CopyTextCommand(milliseconds.ToString(CultureInfo.InvariantCulture)))],
+            Subtitle = $"UTC: {utcText}{FormatZoneSuffix(utc, timeZone)} · Seconds: {seconds} · Milliseconds: {milliseconds}",
+            TextToSuggest = millisecondsText,
+            MoreCommands = [
+                new CommandContextItem(new CopyItemCommand(millisecondsText, "Copy Milliseconds")),
+                new CommandContextItem(new CopyItemCommand(utcText, "Copy UTC")),
+            ],
+            Details = CreateTimestampDetails(
+                millisecondsText,
+                $"**Now** → **{utcText}**{FormatZoneSuffix(utc, timeZone)}",
+                utc,
+                seconds,
+                milliseconds,
+                timeZone),
         };
 
         return item;
@@ -95,30 +108,97 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
             Subtitle = $"Input: {input}{FormatZoneSuffix(utc, timeZone)} · Seconds: {seconds} · Milliseconds: {milliseconds}",
             TextToSuggest = utcText,
             MoreCommands = [new CommandContextItem(new CopyTextCommand(utcText))],
+            Details = CreateTimestampDetails(
+                utcText,
+                $"**{input}** → **{utcText}**{FormatZoneSuffix(utc, timeZone)}",
+                utc,
+                seconds,
+                milliseconds,
+                timeZone,
+                input),
         };
     }
 
     private static ListItem CreateSecondsResultItem(DateTimeOffset utc, long seconds, TimeZoneInfo timeZone)
     {
         var secondsText = seconds.ToString(CultureInfo.InvariantCulture);
+        var utcText = UnixTimestampConverter.FormatUtc(utc);
         return new ListItem(new NoOpCommand())
         {
             Title = secondsText,
-            Subtitle = $"UTC: {UnixTimestampConverter.FormatUtc(utc)}{FormatZoneSuffix(utc, timeZone)}",
+            Subtitle = $"UTC: {utcText}{FormatZoneSuffix(utc, timeZone)}",
             TextToSuggest = secondsText,
             MoreCommands = [new CommandContextItem(new CopyTextCommand(secondsText))],
+            Details = CreateTimestampDetails(
+                secondsText,
+                $"**{utcText}** → **{secondsText} s**{FormatZoneSuffix(utc, timeZone)}",
+                utc,
+                seconds,
+                utc.ToUnixTimeMilliseconds(),
+                timeZone),
         };
     }
 
     private static ListItem CreateMillisecondsResultItem(DateTimeOffset utc, long milliseconds, TimeZoneInfo timeZone)
     {
         var millisecondsText = milliseconds.ToString(CultureInfo.InvariantCulture);
+        var utcText = UnixTimestampConverter.FormatUtc(utc);
         return new ListItem(new NoOpCommand())
         {
             Title = millisecondsText,
-            Subtitle = $"UTC: {UnixTimestampConverter.FormatUtc(utc)}{FormatZoneSuffix(utc, timeZone)}",
+            Subtitle = $"UTC: {utcText}{FormatZoneSuffix(utc, timeZone)}",
             TextToSuggest = millisecondsText,
             MoreCommands = [new CommandContextItem(new CopyTextCommand(millisecondsText))],
+            Details = CreateTimestampDetails(
+                millisecondsText,
+                $"**{utcText}** → **{millisecondsText} ms**{FormatZoneSuffix(utc, timeZone)}",
+                utc,
+                utc.ToUnixTimeSeconds(),
+                milliseconds,
+                timeZone),
+        };
+    }
+
+    /// <summary>
+    /// Builds the side-panel "Details" shown when a result item is selected, surfacing the
+    /// UTC/local timestamps, seconds/milliseconds values, and unit tags at a glance.
+    /// </summary>
+    private static Details CreateTimestampDetails(
+        string title,
+        string body,
+        DateTimeOffset utc,
+        long seconds,
+        long milliseconds,
+        TimeZoneInfo timeZone,
+        string? input = null)
+    {
+        var isUtc = IsUtc(timeZone);
+
+        var metadata = new List<IDetailsElement>();
+
+        if (!string.IsNullOrEmpty(input))
+        {
+            metadata.Add(new DetailsElement { Key = "Input", Data = new DetailsLink { Text = input } });
+        }
+
+        metadata.Add(new DetailsElement { Key = "UTC", Data = new DetailsLink { Text = UnixTimestampConverter.FormatUtc(utc) } });
+
+        if (!isUtc)
+        {
+            metadata.Add(new DetailsElement { Key = timeZone.Id, Data = new DetailsLink { Text = UnixTimestampConverter.FormatInTimeZone(utc, timeZone) } });
+        }
+
+        metadata.Add(new DetailsElement { Key = "Seconds", Data = new DetailsLink { Text = seconds.ToString(CultureInfo.InvariantCulture) } });
+        metadata.Add(new DetailsElement { Key = "Milliseconds", Data = new DetailsLink { Text = milliseconds.ToString(CultureInfo.InvariantCulture) } });
+
+        Tag[] tags = isUtc ? [new Tag("UTC")] : [new Tag("UTC"), new Tag(timeZone.Id)];
+        metadata.Add(new DetailsElement { Key = "Tags", Data = new DetailsTags { Tags = tags } });
+
+        return new Details
+        {
+            Title = title,
+            Body = body,
+            Metadata = metadata.ToArray(),
         };
     }
 
@@ -147,11 +227,21 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
 
     private static string FormatZoneSuffix(DateTimeOffset utc, TimeZoneInfo timeZone)
     {
-        if (string.Equals(timeZone.Id, TimeZoneInfo.Utc.Id, StringComparison.Ordinal))
+        if (IsUtc(timeZone))
         {
             return string.Empty;
         }
 
         return $" · {timeZone.Id}: {UnixTimestampConverter.FormatInTimeZone(utc, timeZone)}";
+    }
+
+    /// <summary>
+    /// Determines whether <paramref name="timeZone"/> is semantically equivalent to UTC, either by
+    /// matching the well-known UTC id or by having a zero offset with no daylight-saving adjustments.
+    /// </summary>
+    private static bool IsUtc(TimeZoneInfo timeZone)
+    {
+        return string.Equals(timeZone.Id, TimeZoneInfo.Utc.Id, StringComparison.Ordinal)
+            || (timeZone.BaseUtcOffset == TimeSpan.Zero && !timeZone.SupportsDaylightSavingTime);
     }
 }
