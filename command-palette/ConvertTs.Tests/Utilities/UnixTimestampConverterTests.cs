@@ -12,14 +12,12 @@ public class UnixTimestampConverterTests
         var success = UnixTimestampConverter.TryConvertFromTimestamp(
             "1700000000",
             UnixTimestampConverter.DefaultBoundaryValue,
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), utc);
-        Assert.Equal(1700000000L, seconds);
-        Assert.Equal(1700000000000L, milliseconds);
+        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), result.Utc);
+        Assert.Equal(1700000000L, result.Seconds);
+        Assert.Equal(1700000000000L, result.Milliseconds);
     }
 
     [Fact]
@@ -28,14 +26,12 @@ public class UnixTimestampConverterTests
         var success = UnixTimestampConverter.TryConvertFromTimestamp(
             "1700000000000",
             UnixTimestampConverter.DefaultBoundaryValue,
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), utc);
-        Assert.Equal(1700000000L, seconds);
-        Assert.Equal(1700000000000L, milliseconds);
+        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), result.Utc);
+        Assert.Equal(1700000000L, result.Seconds);
+        Assert.Equal(1700000000000L, result.Milliseconds);
     }
 
     [Fact]
@@ -44,14 +40,12 @@ public class UnixTimestampConverterTests
         var success = UnixTimestampConverter.TryConvertFromTimestamp(
             "10000000000",
             9999999999L,
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(1970, 4, 26, 17, 46, 40, TimeSpan.Zero), utc);
-        Assert.Equal(10000000L, seconds);
-        Assert.Equal(10000000000L, milliseconds);
+        Assert.Equal(new DateTimeOffset(1970, 4, 26, 17, 46, 40, TimeSpan.Zero), result.Utc);
+        Assert.Equal(10000000L, result.Seconds);
+        Assert.Equal(10000000000L, result.Milliseconds);
     }
 
     [Fact]
@@ -59,24 +53,22 @@ public class UnixTimestampConverterTests
     {
         var success = UnixTimestampConverter.TryConvertToTimestamp(
             "2023-11-14T22:13:20Z",
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), utc);
-        Assert.Equal(1700000000L, seconds);
-        Assert.Equal(1700000000000L, milliseconds);
+        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), result.Utc);
+        Assert.Equal(1700000000L, result.Seconds);
+        Assert.Equal(1700000000000L, result.Milliseconds);
     }
 
     [Fact]
     public void ReturnsCurrentUtcTimestampValues()
     {
-        UnixTimestampConverter.GetNowTimestamps(out var utc, out var seconds, out var milliseconds);
+        var now = UnixTimestampConverter.GetNowTimestamp();
 
-        Assert.Equal(utc.ToUnixTimeMilliseconds(), milliseconds);
-        Assert.Equal(milliseconds / 1000L, seconds);
-        Assert.True(Math.Abs((DateTimeOffset.UtcNow - utc).TotalSeconds) < 5);
+        Assert.Equal(now.Utc.ToUnixTimeMilliseconds(), now.Milliseconds);
+        Assert.Equal(now.Milliseconds / 1000L, now.Seconds);
+        Assert.True(Math.Abs((DateTimeOffset.UtcNow - now.Utc).TotalSeconds) < 5);
     }
 
     [Fact]
@@ -87,14 +79,12 @@ public class UnixTimestampConverterTests
         var success = UnixTimestampConverter.TryConvertToTimestamp(
             "2023-11-14T22:13:20+02:00",
             timeZone,
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(2023, 11, 14, 20, 13, 20, TimeSpan.Zero), utc);
-        Assert.Equal(1699992800L, seconds);
-        Assert.Equal(1699992800000L, milliseconds);
+        Assert.Equal(new DateTimeOffset(2023, 11, 14, 20, 13, 20, TimeSpan.Zero), result.Utc);
+        Assert.Equal(1699992800L, result.Seconds);
+        Assert.Equal(1699992800000L, result.Milliseconds);
     }
 
     [Fact]
@@ -105,14 +95,12 @@ public class UnixTimestampConverterTests
         var success = UnixTimestampConverter.TryConvertToTimestamp(
             "2023-11-14 22:13:20",
             timeZone,
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(2023, 11, 14, 16, 43, 20, TimeSpan.Zero), utc);
-        Assert.Equal(milliseconds / 1000L, seconds);
-        Assert.Equal(utc.ToUnixTimeMilliseconds(), milliseconds);
+        Assert.Equal(new DateTimeOffset(2023, 11, 14, 16, 43, 20, TimeSpan.Zero), result.Utc);
+        Assert.Equal(result.Milliseconds / 1000L, result.Seconds);
+        Assert.Equal(result.Utc.ToUnixTimeMilliseconds(), result.Milliseconds);
     }
 
     [Fact]
@@ -120,14 +108,12 @@ public class UnixTimestampConverterTests
     {
         var success = UnixTimestampConverter.TryConvertToTimestamp(
             "2023-11-14 22:13:20",
-            out var utc,
-            out var seconds,
-            out var milliseconds);
+            out var result);
 
         Assert.True(success);
-        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), utc);
-        Assert.Equal(1700000000L, seconds);
-        Assert.Equal(1700000000000L, milliseconds);
+        Assert.Equal(new DateTimeOffset(2023, 11, 14, 22, 13, 20, TimeSpan.Zero), result.Utc);
+        Assert.Equal(1700000000L, result.Seconds);
+        Assert.Equal(1700000000000L, result.Milliseconds);
     }
 
     [Fact]
