@@ -54,8 +54,8 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
         }
         else if (UnixTimestampConverter.TryConvertToTimestamp(input, timeZone, out var parsed))
         {
-            items.Add(CreateResultItem(parsed, parsed.SecondsText, "s", timeZone));
-            items.Add(CreateResultItem(parsed, parsed.MillisecondsText, "ms", timeZone));
+            items.Add(CreateResultItem(parsed, PrimaryCopyType.Seconds, "s", timeZone));
+            items.Add(CreateResultItem(parsed, PrimaryCopyType.Milliseconds, "ms", timeZone));
         }
         else
         {
@@ -75,7 +75,7 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
             "Now",
             $"UTC: {ts.UtcText}{FormatZoneSuffix(ts.Utc, timeZone)} · Seconds: {ts.Seconds} · Milliseconds: {ts.Milliseconds}",
             $"**Now** → **{ts.UtcText}**{FormatZoneSuffix(ts.Utc, timeZone)}",
-            ts.MillisecondsText,
+            PrimaryCopyType.Milliseconds,
             ts,
             timeZone);
     }
@@ -86,52 +86,95 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
             ts.UtcText,
             $"Input: {input}{FormatZoneSuffix(ts.Utc, timeZone)} · Seconds: {ts.Seconds} · Milliseconds: {ts.Milliseconds}",
             $"**{input}** → **{ts.UtcText}**{FormatZoneSuffix(ts.Utc, timeZone)}",
-            ts.UtcText,
+            PrimaryCopyType.Utc,
             ts,
             timeZone,
             input);
     }
 
-    private static ListItem CreateResultItem(Timestamp ts, string valueText, string unit, TimeZoneInfo timeZone)
+    private static ListItem CreateResultItem(Timestamp ts, PrimaryCopyType primaryCopyType, string unit, TimeZoneInfo timeZone)
     {
         return CreateItem(
-            valueText,
+            GetPrimaryText(primaryCopyType, ts, timeZone),
             $"UTC: {ts.UtcText}{FormatZoneSuffix(ts.Utc, timeZone)}",
-            $"**{ts.UtcText}** → **{valueText} {unit}**{FormatZoneSuffix(ts.Utc, timeZone)}",
-            valueText,
+            $"**{ts.UtcText}** → **{GetPrimaryText(primaryCopyType, ts, timeZone)} {unit}**{FormatZoneSuffix(ts.Utc, timeZone)}",
+            primaryCopyType,
             ts,
             timeZone);
+    }
+
+    private enum PrimaryCopyType
+    {
+        Milliseconds,
+        Seconds,
+        Utc,
+        LocalTimeZone
     }
 
     private static ListItem CreateItem(
         string title,
         string subtitle,
         string body,
-        string primaryText,
+        PrimaryCopyType primaryCopyType,
         Timestamp ts,
         TimeZoneInfo timeZone,
         string? input = null)
     {
-        return new ListItem(new CopyItemCommand(primaryText, "Copy"))
+        var primaryText = GetPrimaryText(primaryCopyType, ts, timeZone);
+        var label = GetLabel(primaryCopyType, timeZone);
+        
+        return new ListItem(new CopyItemCommand(primaryText, label))
         {
             Title = title,
             Subtitle = subtitle,
             TextToSuggest = primaryText,
-            MoreCommands = CreateCopyCommands(ts, timeZone),
+            MoreCommands = CreateCopyCommands(ts, timeZone, primaryCopyType),
             Details = CreateTimestampDetails(primaryText, body, ts, timeZone, input),
         };
     }
 
-    private static IContextItem[] CreateCopyCommands(Timestamp ts, TimeZoneInfo timeZone)
+    private static string GetPrimaryText(PrimaryCopyType primaryCopyType, Timestamp ts, TimeZoneInfo timeZone)
     {
-        var commands = new List<IContextItem>
+        return primaryCopyType switch
         {
-            new CommandContextItem(new CopyItemCommand(ts.MillisecondsText, "Copy Milliseconds")),
-            new CommandContextItem(new CopyItemCommand(ts.SecondsText, "Copy Seconds")),
-            new CommandContextItem(new CopyItemCommand(ts.UtcText, "Copy UTC")),
+            PrimaryCopyType.Milliseconds => ts.MillisecondsText,
+            PrimaryCopyType.Seconds => ts.SecondsText,
+            PrimaryCopyType.Utc => ts.UtcText,
+            PrimaryCopyType.LocalTimeZone => UnixTimestampConverter.FormatInTimeZone(ts.Utc, timeZone),
+            _ => throw new ArgumentOutOfRangeException(nameof(primaryCopyType), primaryCopyType, null)
         };
+    }
 
-        if (!IsUtc(timeZone))
+    private static string GetLabel(PrimaryCopyType primaryCopyType, TimeZoneInfo timeZone)
+    {
+        return primaryCopyType switch
+        {
+            PrimaryCopyType.Milliseconds => "Copy Milliseconds",
+            PrimaryCopyType.Seconds => "Copy Seconds",
+            PrimaryCopyType.Utc => "Copy UTC",
+            PrimaryCopyType.LocalTimeZone =>  $"Copy {timeZone.Id}",
+            _ => throw new ArgumentOutOfRangeException(nameof(primaryCopyType), primaryCopyType, null)
+        };
+    }
+
+    private static IContextItem[] CreateCopyCommands(Timestamp ts, TimeZoneInfo timeZone, PrimaryCopyType primaryCopyType)
+    {
+        var commands = new List<IContextItem>();
+
+        if(primaryCopyType != PrimaryCopyType.Milliseconds)
+        {
+            commands.Add(new CommandContextItem(new CopyItemCommand(ts.MillisecondsText, "Copy Milliseconds")));
+        }
+        if(primaryCopyType != PrimaryCopyType.Seconds)
+        {
+            commands.Add(new CommandContextItem(new CopyItemCommand(ts.SecondsText, "Copy Seconds")));
+        }
+        if(primaryCopyType != PrimaryCopyType.Utc)
+        {
+            commands.Add(new CommandContextItem(new CopyItemCommand(ts.UtcText, "Copy UTC")));
+        }
+
+        if (primaryCopyType != PrimaryCopyType.LocalTimeZone && !IsUtc(timeZone))
         {
             commands.Add(new CommandContextItem(new CopyItemCommand(UnixTimestampConverter.FormatInTimeZone(ts.Utc, timeZone), $"Copy {timeZone.Id}")));
         }
@@ -169,7 +212,7 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
         metadata.Add(new DetailsElement { Key = "Seconds", Data = new DetailsLink { Text = ts.SecondsText } });
         metadata.Add(new DetailsElement { Key = "Milliseconds", Data = new DetailsLink { Text = ts.MillisecondsText } });
 
-        Tag[] tags = isUtc ? [new Tag("UTC")] : [new Tag("UTC"), new Tag(timeZone.Id)];
+        Tag[] tags = isUtc ? new[] { new Tag("UTC") } : new[] { new Tag("UTC"), new Tag(timeZone.Id) };
         metadata.Add(new DetailsElement { Key = "Tags", Data = new DetailsTags { Tags = tags } });
 
         return new Details
