@@ -37,20 +37,15 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
     {
         var timeZone = _settingsManager.TimeZone;
 
-        var items = new List<IListItem>
-        {
-            CreateNowItem(timeZone),
-        };
+        var items = new List<IListItem>();
 
         var input = _query.Trim();
         if (string.IsNullOrWhiteSpace(input))
         {
-            items.Add(CreateHintItem());
-            items.Add(CreateSettingsItem(_settingsManager));
-            return items.ToArray();
+            items.Add(CreateNowItem(timeZone));
+            items.Add(CreateHintItem(timeZone));
         }
-
-        if (UnixTimestampConverter.TryConvertFromTimestamp(
+        else if (UnixTimestampConverter.TryConvertFromTimestamp(
                 input,
                 _settingsManager.BoundaryValue,
                 out var utc,
@@ -58,17 +53,19 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
                 out var milliseconds))
         {
             items.Add(CreateFromTimestampItem(input, utc, seconds, milliseconds, timeZone));
-            return items.ToArray();
         }
-
-        if (UnixTimestampConverter.TryConvertToTimestamp(input, timeZone, out var parsedUtc, out var parsedSeconds, out var parsedMilliseconds))
+        else if (UnixTimestampConverter.TryConvertToTimestamp(input, timeZone, out var parsedUtc, out var parsedSeconds, out var parsedMilliseconds))
         {
             items.Add(CreateSecondsResultItem(parsedUtc, parsedSeconds, timeZone));
             items.Add(CreateMillisecondsResultItem(parsedUtc, parsedMilliseconds, timeZone));
-            return items.ToArray();
+        }
+        else
+        {
+            items.Add(CreateNowItem(timeZone));
+            items.Add(CreateHintItem(timeZone, input));
         }
 
-        items.Add(CreateHintItem(input));
+        items.Add(CreateSettingsItem(_settingsManager));
         return items.ToArray();
     }
 
@@ -202,16 +199,30 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
         };
     }
 
-    private static ListItem CreateHintItem(string? input = null)
+    private static ListItem CreateHintItem(TimeZoneInfo timeZone, string? input = null)
     {
         var subtitle = string.IsNullOrWhiteSpace(input)
             ? "Enter a Unix timestamp or date/time string"
             : $"No conversion result for '{input}'";
+        UnixTimestampConverter.GetNowTimestamps(out var utc, out var seconds, out var milliseconds);
+        var millisecondsText = milliseconds.ToString(CultureInfo.InvariantCulture);
+        var utcText = UnixTimestampConverter.FormatUtc(utc);
 
         return new ListItem(new NoOpCommand())
         {
             Title = "Unix Epoch Converter",
             Subtitle = subtitle,
+            MoreCommands = [
+                new CommandContextItem(new CopyItemCommand(millisecondsText, "Copy Milliseconds")),
+                new CommandContextItem(new CopyItemCommand(utcText, "Copy UTC")),
+            ],
+            Details = CreateTimestampDetails(
+                millisecondsText,
+                $"**Now** → **{utcText}**{FormatZoneSuffix(utc, timeZone)}",
+                utc,
+                seconds,
+                milliseconds,
+                timeZone),
         };
     }
 
