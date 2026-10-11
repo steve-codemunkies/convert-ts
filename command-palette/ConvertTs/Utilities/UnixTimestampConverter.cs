@@ -10,17 +10,17 @@ public static partial class UnixTimestampConverter
 
     public const string UtcDisplayFormat = "yyyy-MM-ddTHH:mm:ss.fff'Z'";
 
-    public static bool TryConvertFromTimestamp(string input, long boundary, out DateTimeOffset utc, out long seconds, out long milliseconds)
+    public static bool TryConvertFromTimestamp(string input, long boundary, out Timestamp result)
     {
-        utc = default;
-        seconds = 0;
-        milliseconds = 0;
+        result = default;
 
         if (!long.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var timestamp))
         {
             return false;
         }
 
+        long seconds;
+        long milliseconds;
         if (timestamp > boundary)
         {
             milliseconds = timestamp;
@@ -34,54 +34,46 @@ public static partial class UnixTimestampConverter
 
         try
         {
-            utc = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
+            result = new Timestamp(DateTimeOffset.FromUnixTimeMilliseconds(milliseconds), seconds, milliseconds);
             return true;
         }
         catch (ArgumentOutOfRangeException)
         {
-            utc = default;
-            seconds = 0;
-            milliseconds = 0;
             return false;
         }
     }
 
-    public static bool TryConvertToTimestamp(string input, out DateTimeOffset utc, out long seconds, out long milliseconds)
+    public static bool TryConvertToTimestamp(string input, out Timestamp result)
     {
-        return TryConvertToTimestamp(input, TimeZoneInfo.Utc, out utc, out seconds, out milliseconds);
+        return TryConvertToTimestamp(input, TimeZoneInfo.Utc, out result);
     }
 
-    public static bool TryConvertToTimestamp(string input, TimeZoneInfo timeZone, out DateTimeOffset utc, out long seconds, out long milliseconds)
+    public static bool TryConvertToTimestamp(string input, TimeZoneInfo timeZone, out Timestamp result)
     {
-        utc = default;
-        seconds = 0;
-        milliseconds = 0;
+        result = default;
 
-        if (!TryParseDateTimeOffset(input, timeZone, out utc))
+        if (!TryParseDateTimeOffset(input, timeZone, out var utc))
         {
             return false;
         }
 
         try
         {
-            milliseconds = utc.ToUnixTimeMilliseconds();
-            seconds = milliseconds / 1000L;
+            var milliseconds = utc.ToUnixTimeMilliseconds();
+            result = new Timestamp(utc, milliseconds / 1000L, milliseconds);
             return true;
         }
         catch (ArgumentOutOfRangeException)
         {
-            utc = default;
-            seconds = 0;
-            milliseconds = 0;
             return false;
         }
     }
 
-    public static void GetNowTimestamps(out DateTimeOffset utc, out long seconds, out long milliseconds)
+    public static Timestamp GetNowTimestamp()
     {
-        utc = DateTimeOffset.UtcNow;
-        milliseconds = utc.ToUnixTimeMilliseconds();
-        seconds = milliseconds / 1000L;
+        var utc = DateTimeOffset.UtcNow;
+        var milliseconds = utc.ToUnixTimeMilliseconds();
+        return new Timestamp(utc, milliseconds / 1000L, milliseconds);
     }
 
     /// <summary>
