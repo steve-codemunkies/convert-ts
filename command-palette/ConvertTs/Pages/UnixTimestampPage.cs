@@ -79,52 +79,10 @@ internal sealed partial class UnixTimestampPage : DynamicListPage
                 Title = value.Text,
                 Subtitle = value.Label,
                 TextToSuggest = value.Text,
-                Details = CreateTimestampDetails(value.Text, $"**{value.Label}**", ts, timeZone, input),
             };
         }
 
         return items;
-    }
-
-    /// <summary>
-    /// Builds the side-panel "Details" shown when a result item is selected, surfacing the
-    /// UTC/local timestamps, seconds/milliseconds values, and unit tags at a glance.
-    /// </summary>
-    private static Details CreateTimestampDetails(
-        string title,
-        string body,
-        Timestamp ts,
-        TimeZoneInfo timeZone,
-        string? input = null)
-    {
-        var isUtc = ConversionResults.IsUtc(timeZone);
-
-        var metadata = new List<IDetailsElement>();
-
-        if (!string.IsNullOrEmpty(input))
-        {
-            metadata.Add(new DetailsElement { Key = "Input", Data = new DetailsLink { Text = input } });
-        }
-
-        metadata.Add(new DetailsElement { Key = "UTC", Data = new DetailsLink { Text = ts.UtcText } });
-
-        if (!isUtc)
-        {
-            metadata.Add(new DetailsElement { Key = timeZone.Id, Data = new DetailsLink { Text = UnixTimestampConverter.FormatInTimeZone(ts.Utc, timeZone) } });
-        }
-
-        metadata.Add(new DetailsElement { Key = "Seconds", Data = new DetailsLink { Text = ts.SecondsText } });
-        metadata.Add(new DetailsElement { Key = "Milliseconds", Data = new DetailsLink { Text = ts.MillisecondsText } });
-
-        Tag[] tags = isUtc ? new[] { new Tag("UTC") } : new[] { new Tag("UTC"), new Tag(timeZone.Id) };
-        metadata.Add(new DetailsElement { Key = "Tags", Data = new DetailsTags { Tags = tags } });
-
-        return new Details
-        {
-            Title = title,
-            Body = body,
-            Metadata = metadata.ToArray(),
-        };
     }
 
     private static ListItem CreateHintItem(string? input = null)
