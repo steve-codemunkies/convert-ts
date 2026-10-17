@@ -101,7 +101,7 @@ Add-AppxPackage -Register .\AppxManifest.xml -ForceUpdateFromAnyVersion
 Run the helper tests:
 
 ```powershell
-dotnet test .\command-palette\ConvertTs.CommandPalette.Tests\ConvertTs.CommandPalette.Tests.csproj
+dotnet test .\command-palette\ConvertTs.Tests\ConvertTs.Tests.csproj
 ```
 
 ## Settings
