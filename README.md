@@ -66,3 +66,13 @@ Converts a date/time string to a Unix epoch timestamp. Returns milliseconds by d
 ### Documentation
 
 Full parameter reference and examples are available in [docs/bash/Convert-UnixTimestamp.md](docs/bash/Convert-UnixTimestamp.md).
+
+## PowerToys Command Palette
+
+Convert timestamps right within Command Palette!
+
+![Screenshot 1](./assets/screenshot1.png) ![Screenshot 2](./assets/screenshot2.png) ![Screenshot 3](./assets/screenshot3.png)
+
+### Docmentation
+
+Full documentation is avaiable in [command-palette/README.md](./command-palette/README.md)
