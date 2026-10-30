@@ -1,0 +1,3 @@
+[Files]
+".\bin\x64\Release\net10.0-windows10.0.26100.0\win-x64\ConvertTs_0.0.1.0_x64.msix" "ConvertTs_0.0.1.0_x64.msix"
+".\bin\ARM64\Release\net10.0-windows10.0.26100.0\win-arm64\ConvertTs_0.0.1.0_arm64.msix" "ConvertTs_0.0.1.0_arm64.msix"

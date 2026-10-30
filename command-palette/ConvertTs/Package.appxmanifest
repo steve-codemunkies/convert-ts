@@ -16,7 +16,7 @@
        Publisher= to match your own identity -->
 
   <Properties>
-    <DisplayName>StevenHocking.ConvertTS</DisplayName>
+    <DisplayName>Convert TS</DisplayName>
     <PublisherDisplayName>Steven Hocking</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
