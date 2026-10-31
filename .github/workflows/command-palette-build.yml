@@ -1,0 +1,74 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 0.3.0)'
+        required: true
+        type: string
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [x64, ARM64]
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Setup msbuild.exe
+      uses: microsoft/setup-msbuild@v3
+
+    - name: Get version
+      run: |
+        if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+          $version = '${{ inputs.version }}'
+        } else {
+          $version = '${{ github.ref_name }}'
+        }
+        if ($version -notmatch '^\d+(\.\d+){1,3}$') {
+          throw "Invalid version '$version'. Use a numeric version like 0.3.0 (tag push or workflow_dispatch input)."
+        }
+        echo "VERSION=$version" >> $env:GITHUB_ENV
+
+    - name: Set version
+      run: |
+        [Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")
+        $xIdentity = [System.Xml.Linq.XName]::Get("{http://schemas.microsoft.com/appx/manifest/foundation/windows10}Identity");
+        $appxmanifests = Get-ChildItem -Path command-palette\ConvertTs -Filter *.appxmanifest -Recurse
+        foreach ($appxmanifestPath in $appxmanifests) {
+          $appxmanifest = [System.Xml.Linq.XDocument]::Load($appxmanifestPath)
+          $appxmanifest.Root.Element($xIdentity).Attribute("Version").Value = "${{env.VERSION}}.0"
+          $appxmanifest.Save($appxmanifestPath)
+        }
+
+    - name: Restore packages
+      run: msbuild command-palette\ConvertTs.sln /t:Restore /p:Configuration=Release /p:Platform=${{matrix.platform}}
+
+    - name: Build Convert TS
+      run: msbuild command-palette\ConvertTs\ConvertTs.csproj /p:Configuration=Release /p:Platform=${{matrix.platform}} /p:Version=${{env.VERSION}}
+
+    - name: Prepare artifact
+      run: |
+        New-Item -Type Directory build
+        Get-ChildItem -Path command-palette\ConvertTs -Recurse -Include *.msix | Where-Object { $_.FullName -notmatch "\\Dependencies\\" } | ForEach-Object {
+          Copy-Item -Path $_.FullName -Destination build
+        }
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ConvertTs-${{env.VERSION}}-${{matrix.platform}}
+        path: build\*.msix
