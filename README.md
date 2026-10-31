@@ -69,6 +69,8 @@ Full parameter reference and examples are available in [docs/bash/Convert-UnixTi
 
 ## PowerToys Command Palette
 
+[![Microsoft](https://get.microsoft.com/images/en-us%20dark.svg)](https://apps.microsoft.com/detail/9NC5DZWNF692)
+
 Convert timestamps right within Command Palette!
 
 ![Screenshot 1](./assets/screenshot1.png) ![Screenshot 2](./assets/screenshot2.png) ![Screenshot 3](./assets/screenshot3.png)

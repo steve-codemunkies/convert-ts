@@ -23,13 +23,19 @@ The boundary value and timezone are user-configurable — see [Settings](#settin
 - `ConvertTs/` — the PowerToys Command Palette extension project
 - `ConvertTs.Tests/` — helper-focused unit tests for the shared converter logic
 
-## Prerequisites
+## Install from Microsoft Store
+
+[![Microsoft](https://get.microsoft.com/images/en-us%20dark.svg)](https://apps.microsoft.com/detail/9NC5DZWNF692)
+
+## Build and Install from Source
+
+### Prerequisites
 
 - Windows 11 with PowerToys (version supporting Command Palette extensions)
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - **Windows SDK 10.0.26100.0** (Windows 11 24H2) — required by the `Microsoft.CommandPalette.Extensions` NuGet package
 
-### Installing the Windows SDK
+#### Installing the Windows SDK
 
 The extension project targets `net10.0-windows10.0.26100.0`, which requires the Windows 11 SDK version 10.0.26100.0. Without it the build fails with error `APPX3217`.
 
@@ -48,7 +54,7 @@ Download and run the Windows 11 SDK installer directly from Microsoft:
 
 Select version **10.0.26100.0** (Windows 11, version 24H2).
 
-## Build
+### Build
 
 Build the extension project:
 
@@ -58,7 +64,20 @@ dotnet build command-palette\ConvertTs\ConvertTs.csproj -c Debug /p:Platform=x64
 
 > Note: the project targets `net10.0-windows10.0.26100.0`. Ensure both the .NET 10 SDK and Windows SDK 10.0.26100.0 are installed before building (see [Prerequisites](#prerequisites)).
 
-## Install into PowerToys Command Palette (local)
+### Release build (same steps as CI)
+
+The release workflow [command-palette-build.yml](../.github/workflows/command-palette-build.yml) is a thin wrapper
+around the scripts in [.github/scripts](../.github/scripts), so the exact CI steps can be run locally:
+
+```powershell
+.\.github\scripts\Invoke-ReleaseBuild.ps1 -Version 0.3.0 -Platform x64
+```
+
+This validates the version, stamps `Package.appxmanifest`, restores, builds the MSIX, and collects the
+packages into `.\build`. Each step can also be run on its own: `Get-BuildVersion.ps1`, `Set-AppxVersion.ps1`,
+`Build-ConvertTs.ps1`, `Export-MsixArtifact.ps1`.
+
+### Install into PowerToys Command Palette (local)
 
 1. Build the extension project:
 
@@ -96,7 +115,7 @@ cd ".\command-palette\ConvertTs\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x6
 Add-AppxPackage -Register .\AppxManifest.xml -ForceUpdateFromAnyVersion
 ```
 
-## Test
+### Test
 
 Run the helper tests:
 
@@ -104,7 +123,7 @@ Run the helper tests:
 dotnet test .\command-palette\ConvertTs.Tests\ConvertTs.Tests.csproj
 ```
 
-## Settings
+### Settings
 
 The extension exposes two configurable settings:
 
@@ -131,7 +150,7 @@ You can open the settings page in any of the following ways:
 2. **From the command's context menu** — open **convert ts**, then use the context menu (or its keyboard shortcut) on the top-level command and choose the settings entry.
 3. **From Command Palette's global settings** — open Command Palette's own **Settings → Extensions** page and select this extension's entry.
 
-## Expected inputs
+### Expected inputs
 
 Examples of inputs the extension should accept:
 
@@ -140,14 +159,14 @@ Examples of inputs the extension should accept:
 - `2023-11-14T22:13:20Z`
 - `2024-03-15`
 
-## Follow-up work
+### Follow-up work
 
 The initial version intentionally leaves room for later additions such as:
 
 - custom input/output formats
 - packaging/distribution guidance
 
-## Uninstalling from PowerToys Command Palette (local)
+### Uninstalling from PowerToys Command Palette (local)
 
 The easiest way I have found to remove the extension is as follows:
 

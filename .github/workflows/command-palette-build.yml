@@ -1,0 +1,55 @@
+name: Command Palette Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 0.3.0)'
+        required: true
+        type: string
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [x64, ARM64]
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Setup msbuild.exe
+      uses: microsoft/setup-msbuild@v3
+
+    # All build logic lives in .github/scripts so the exact same steps can be
+    # run locally via .github/scripts/Invoke-ReleaseBuild.ps1 -Version 0.3.0
+    - name: Get version
+      env:
+        BUILD_VERSION_INPUT: ${{ inputs.version }}
+        BUILD_VERSION_TAG: ${{ github.ref_name }}
+      run: .github/scripts/Get-BuildVersion.ps1 -InputVersion $env:BUILD_VERSION_INPUT -RefName $env:BUILD_VERSION_TAG -EventName $env:GITHUB_EVENT_NAME
+
+    - name: Set version
+      run: .github/scripts/Set-AppxVersion.ps1 -Version $env:VERSION
+
+    - name: Build Convert TS
+      run: .github/scripts/Build-ConvertTs.ps1 -Platform ${{ matrix.platform }} -Version $env:VERSION
+
+    - name: Prepare artifact
+      run: .github/scripts/Export-MsixArtifact.ps1
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ConvertTs-${{env.VERSION}}-${{matrix.platform}}
+        path: build\*.msix
