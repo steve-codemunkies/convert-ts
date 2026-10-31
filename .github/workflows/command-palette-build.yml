@@ -1,4 +1,4 @@
-name: Build
+name: Command Palette Build
 
 on:
   workflow_dispatch:
