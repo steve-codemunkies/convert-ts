@@ -58,6 +58,19 @@ dotnet build command-palette\ConvertTs\ConvertTs.csproj -c Debug /p:Platform=x64
 
 > Note: the project targets `net10.0-windows10.0.26100.0`. Ensure both the .NET 10 SDK and Windows SDK 10.0.26100.0 are installed before building (see [Prerequisites](#prerequisites)).
 
+### Release build (same steps as CI)
+
+The release workflow [command-palette-build.yml](../.github/workflows/command-palette-build.yml) is a thin wrapper
+around the scripts in [.github/scripts](../.github/scripts), so the exact CI steps can be run locally:
+
+```powershell
+.\.github\scripts\Invoke-ReleaseBuild.ps1 -Version 0.3.0 -Platform x64
+```
+
+This validates the version, stamps `Package.appxmanifest`, restores, builds the MSIX, and collects the
+packages into `.\build`. Each step can also be run on its own: `Get-BuildVersion.ps1`, `Set-AppxVersion.ps1`,
+`Build-ConvertTs.ps1`, `Export-MsixArtifact.ps1`.
+
 ## Install into PowerToys Command Palette (local)
 
 1. Build the extension project:
