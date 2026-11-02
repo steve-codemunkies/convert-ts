@@ -115,5 +115,9 @@
     <ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors>
   </PropertyGroup>
 
-
+  <PropertyGroup>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms Condition="'$(Platform)'=='x64'">x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms Condition="'$(Platform)'=='ARM64'">arm64</AppxBundlePlatforms>
+  </PropertyGroup>
 </Project>
