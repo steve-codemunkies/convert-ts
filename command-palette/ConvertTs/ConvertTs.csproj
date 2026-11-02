@@ -36,7 +36,7 @@
     <Copy SourceFiles="$(MSBuildProjectDirectory)\Assets\Square150x150Logo.scale-200.png"
           DestinationFiles="$(MSBuildProjectDirectory)\Assets\LargeTile.png"
           SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\Assets\StoreLogo.scale-100.png"
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Assets\StoreLogo.scale-200.png"
           DestinationFiles="$(MSBuildProjectDirectory)\Assets\StoreLogo.png"
           SkipUnchangedFiles="true" />
   </Target>
