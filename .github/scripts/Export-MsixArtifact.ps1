@@ -24,7 +24,7 @@ $ErrorActionPreference = 'Stop'
 
 New-Item -ItemType Directory -Force -Path $Destination | Out-Null
 
-$packages = @(Get-ChildItem -Path $SourcePath -Recurse -Filter *.msix |
+$packages = @(Get-ChildItem -Path $SourcePath -Recurse -Filter *.msix* |
     Where-Object { $_.FullName -notmatch '\\Dependencies\\' })
 
 if ($packages.Count -eq 0) {
