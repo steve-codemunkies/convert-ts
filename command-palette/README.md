@@ -34,6 +34,11 @@ The boundary value and timezone are user-configurable — see [Settings](#settin
 - Windows 11 with PowerToys (version supporting Command Palette extensions)
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - **Windows SDK 10.0.26100.0** (Windows 11 24H2) — required by the `Microsoft.CommandPalette.Extensions` NuGet package
+- [resvg](https://github.com/linebender/resvg) — only needed to regenerate the icon PNGs from the SVG sources (see [Icons](#icons)). Install with winget:
+
+  ```powershell
+  winget install -e --id linebender.resvg
+  ```
 
 #### Installing the Windows SDK
 
@@ -53,6 +58,23 @@ Download and run the Windows 11 SDK installer directly from Microsoft:
 <https://developer.microsoft.com/windows/downloads/windows-sdk/>
 
 Select version **10.0.26100.0** (Windows 11, version 24H2).
+
+### Icons
+
+The visual assets referenced by `Package.appxmanifest` (`StoreLogo`, `Square44x44Logo`, `Square150x150Logo`, `Wide310x150Logo`, and `SplashScreen`) are raster PNGs generated from the SVG sources in `ConvertTs/Assets`:
+
+- `convert-ts.svg` — square artwork used for `StoreLogo`, `Square44x44Logo`, and `Square150x150Logo`
+- `convert-ts.wide.svg` — wide (31:15) artwork used for `Wide310x150Logo` and `SplashScreen`
+
+Each asset is generated at scale-100, scale-200, and scale-400 (e.g. `Square150x150Logo.scale-100.png`, `Square150x150Logo.scale-200.png`, `Square150x150Logo.scale-400.png`) so Windows and the Store can pick a pixel-perfect image for the user's display scale. For the size tables and padding guidance see [Construct your app's icon](https://learn.microsoft.com/windows/apps/design/iconography/app-icon-construction).
+
+To regenerate the PNGs after changing either SVG, run (requires resvg — see [Prerequisites](#prerequisites)):
+
+```powershell
+.\scripts\Generate-Pngs.ps1
+```
+
+The script rasterizes the SVGs with resvg and writes the fifteen PNGs into `ConvertTs/Assets`. The generated files are committed to the repo — icon generation is a design-time step, not part of the build or CI.
 
 ### Build
 
