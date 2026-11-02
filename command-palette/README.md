@@ -71,7 +71,7 @@ Each asset is generated at scale-100, scale-200, and scale-400 (e.g. `Square150x
 To regenerate the PNGs after changing either SVG, run (requires resvg — see [Prerequisites](#prerequisites)):
 
 ```powershell
-.\scripts\Generate-Pngs.ps1
+.\.github\scripts\Generate-Pngs.ps1
 ```
 
 The script rasterizes the SVGs with resvg and writes the fifteen PNGs into `ConvertTs/Assets`. The generated files are committed to the repo — icon generation is a design-time step, not part of the build or CI.

@@ -14,7 +14,7 @@
     required values (150, 300, 600, 1200).
 
 .EXAMPLE
-    .\command-palette\scripts\Generate-Pngs.ps1
+    .\.github\scripts\Generate-Pngs.ps1
 #>
 [CmdletBinding()]
 param(
