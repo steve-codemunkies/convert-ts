@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>convert-ts — Unix epoch timestamp converter</title>
+  <meta name="description" content="Convert between Unix epoch timestamps and human-readable date/times, entirely in your browser.">
+  <link rel="icon" type="image/svg+xml" href="./assets/convert-ts.svg">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./index.html">
+      <img src="./assets/convert-ts.svg" alt="" width="40" height="40">
+      <span>convert-ts</span>
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="./index.html" aria-current="page">Converter</a>
+      <a href="./docs.html">Documentation</a>
+      <a href="https://github.com/steve-codemunkies/convert-ts">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img class="hero-image" src="./assets/convert-ts.wide.svg" alt="convert-ts — calendar and clock artwork">
+      <p class="tagline">Convert between Unix epoch timestamps and human-readable date/times — entirely in your browser.</p>
+    </section>
+
+    <section class="card converter" aria-labelledby="converter-heading">
+      <h1 id="converter-heading">Unix epoch converter</h1>
+
+      <div class="controls">
+        <label class="field field-grow">
+          <span class="field-label">Timestamp or date/time</span>
+          <input id="query" type="text" placeholder="Type a Unix timestamp or date/time string"
+                 autocomplete="off" spellcheck="false" autofocus>
+        </label>
+        <label class="field">
+          <span class="field-label">Time zone</span>
+          <select id="timezone"></select>
+        </label>
+        <label class="field field-boundary">
+          <span class="field-label">ms boundary</span>
+          <input id="boundary" type="text" inputmode="numeric" autocomplete="off"
+                 title="Timestamps greater than this value are treated as milliseconds">
+        </label>
+      </div>
+
+      <p class="hint" id="hint" hidden></p>
+
+      <table class="results" id="results">
+        <thead>
+          <tr>
+            <th scope="col">Value</th>
+            <th scope="col">Result</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+
+      <div class="examples">
+        <span>Try:</span>
+        <button type="button" class="example" data-example="1700000000">1700000000</button>
+        <button type="button" class="example" data-example="1700000000000">1700000000000</button>
+        <button type="button" class="example" data-example="2023-11-14T22:13:20Z">2023-11-14T22:13:20Z</button>
+        <button type="button" class="example" data-example="2024-03-15">2024-03-15</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      <a href="./docs.html">Documentation</a> ·
+      <a href="https://github.com/steve-codemunkies/convert-ts">Source on GitHub</a>
+    </p>
+  </footer>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
