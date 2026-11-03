@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - docs-site # temporary, so the deployment can be verified before merging; remove after merging to main
     paths:
       - 'site/**'
       - 'docs/**'
