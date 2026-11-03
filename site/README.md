@@ -27,13 +27,44 @@ documentation pages render the Markdown from [`docs/`](../docs) and
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 20 or later (LTS recommended). On Windows:
+- [Node.js](https://nodejs.org/) 20 or later (LTS recommended).
 
-  ```powershell
-  winget install -e --id OpenJS.NodeJS.LTS
-  ```
+There is **nothing to install** for the site itself — the project has no npm dependencies. You only
+need `node` (and `npm`) executables, via either of the options below.
 
-There is **nothing to install** — the project has no npm dependencies.
+#### Option A — install Node.js (recommended)
+
+On Windows:
+
+```powershell
+winget install -e --id OpenJS.NodeJS.LTS
+```
+
+Or download the LTS installer from <https://nodejs.org/>.
+
+#### Option B — portable Node.js on Windows (no install, no admin rights)
+
+If you don't want to install Node.js system-wide, use the official zip build. This example uses
+Node 22 LTS and puts everything under `$env:TEMP`:
+
+```powershell
+# Download and extract (any v20+ version works)
+Invoke-WebRequest -Uri 'https://nodejs.org/dist/v22.11.0/node-v22.11.0-win-x64.zip' -OutFile "$env:TEMP\node-portable.zip"
+Expand-Archive -Path "$env:TEMP\node-portable.zip" -DestinationPath "$env:TEMP\node-portable" -Force
+
+# Put the portable binaries on PATH for this terminal session only
+$env:PATH = "$env:TEMP\node-portable\node-v22.11.0-win-x64;$env:PATH"
+
+node --version
+```
+
+Notes:
+
+- The `$env:PATH` change lasts only for the current terminal session — re-run it in each new
+  terminal, or invoke `node.exe` by its full path.
+- `node` must be on PATH when using the npm scripts (`npm test`, `npm start`), because npm spawns
+  `node` as a child process. Without PATH changes, call node directly instead, e.g.
+  `& "$env:TEMP\node-portable\node-v22.11.0-win-x64\node.exe" build.mjs`.
 
 ### Run the unit tests
 
