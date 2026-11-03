@@ -1,0 +1,17 @@
+{
+  "name": "convert-ts-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Documentation site for convert-ts, hosted on GitHub Pages",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/steve-codemunkies/convert-ts.git"
+  },
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.js\"",
+    "build": "node build.mjs",
+    "serve": "node serve.mjs",
+    "start": "node build.mjs && node serve.mjs"
+  }
+}

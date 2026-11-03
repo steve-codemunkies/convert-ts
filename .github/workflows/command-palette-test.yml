@@ -1,4 +1,4 @@
-name: Command Palette Test
+name: Command Palette - Test
 
 on:
   workflow_dispatch:

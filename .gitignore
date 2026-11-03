@@ -427,3 +427,7 @@ FodyWeavers.xsd
 *.msixbundle
 *.msm
 *.msp
+**/bundle_mapping.txt
+
+# Documentation site build output
+site/dist/

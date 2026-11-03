@@ -78,3 +78,11 @@ Convert timestamps right within Command Palette!
 ### Docmentation
 
 Full documentation is avaiable in [command-palette/README.md](./command-palette/README.md)
+
+## Documentation site
+
+The documentation site is published to GitHub Pages at
+<https://convert-ts.stevehocking.co.uk/>. It includes a browser-based version of the
+timestamp converter and renders the Markdown documentation from `docs/` and `command-palette/`.
+
+See [site/README.md](./site/README.md) for how to build, test, and run the site locally.
