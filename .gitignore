@@ -427,3 +427,4 @@ FodyWeavers.xsd
 *.msixbundle
 *.msm
 *.msp
+**/bundle_mapping.txt
