@@ -1,7 +1,7 @@
 # convert-ts documentation site
 
 A static documentation + converter site for this repository, published to GitHub Pages at
-<https://steve-codemunkies.github.io/convert-ts/>.
+<https://convert-ts.stevehocking.co.uk/>.
 
 The front page is a browser-based Unix epoch timestamp converter with the same behavior as the
 PowerToys Command Palette extension (same boundary rule, same output values and formats). The
@@ -112,6 +112,20 @@ the unit tests, builds the site, and publishes `site/dist` to GitHub Pages on ev
 touches the site sources or documentation.
 
 One-time repository setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+### Custom domain
+
+The site is served from the custom subdomain <https://convert-ts.stevehocking.co.uk/>:
+
+1. In the DNS provider for `stevehocking.co.uk`, create a **CNAME** record for `convert-ts`
+   pointing at `steve-codemunkies.github.io`.
+2. In the repository: **Settings → Pages → Custom domain**, enter `convert-ts.stevehocking.co.uk`,
+   save, and wait for the DNS check to pass.
+3. Once the certificate has been provisioned, enable **Enforce HTTPS**.
+
+[`src/CNAME`](src/CNAME) is copied into the build output on every build, so the custom domain
+survives every deployment. All site links are relative, so the site also keeps working at the
+default project path `https://steve-codemunkies.github.io/convert-ts/`.
 
 Site JavaScript is also tested on every pull request that touches `site/` by
 [`.github/workflows/site-test.yml`](../.github/workflows/site-test.yml).
