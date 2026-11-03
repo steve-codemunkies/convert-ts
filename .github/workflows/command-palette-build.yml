@@ -1,4 +1,4 @@
-name: Command Palette Build
+name: Command Palette - Build
 
 permissions:
   contents: write    # required to create releases

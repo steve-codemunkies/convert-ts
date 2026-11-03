@@ -90,7 +90,7 @@ Any change to `src/`, the Markdown docs, or the icons requires re-running `npm r
 
 ## Deployment
 
-Deployment is handled by [`.github/workflows/pages.yml`](../.github/workflows/pages.yml), which runs
+Deployment is handled by [`.github/workflows/site-publish.yml`](../.github/workflows/site-publish.yml), which runs
 the unit tests, builds the site, and publishes `site/dist` to GitHub Pages on every push that
 touches the site sources or documentation.
 
