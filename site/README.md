@@ -21,6 +21,8 @@ documentation pages render the Markdown from [`docs/`](../docs) and
 - `build.mjs` — assembles `dist/` from `src/`, the extension's SVG icons, and the documentation
   Markdown sources. Pure Node.js standard library.
 - `serve.mjs` — minimal static file server for local testing.
+- `Use-PortableNode.ps1` — downloads a portable Node.js build and puts it on PATH (for Windows
+  machines without Node.js installed).
 - `tests/` — unit tests run with the built-in Node.js test runner. No dependencies.
 
 ## Local testing
@@ -44,8 +46,23 @@ Or download the LTS installer from <https://nodejs.org/>.
 
 #### Option B — portable Node.js on Windows (no install, no admin rights)
 
-If you don't want to install Node.js system-wide, use the official zip build. This example uses
-Node 22 LTS and puts everything under `$env:TEMP`:
+If you don't want to install Node.js system-wide, use the official zip build via the helper script
+[`Use-PortableNode.ps1`](Use-PortableNode.ps1). Run it **dot-sourced** from the repository root so
+the PATH change applies to your current terminal:
+
+```powershell
+. .\site\Use-PortableNode.ps1
+```
+
+Then verify:
+
+```powershell
+node --version
+```
+
+The script downloads Node 22 LTS to `$env:TEMP\node-portable` (pass `-Version` or `-Destination`
+to change this), skips the download if it is already present, and prepends the binaries to
+`$env:PATH`. It is equivalent to running these steps manually:
 
 ```powershell
 # Download and extract (any v20+ version works)
@@ -60,8 +77,8 @@ node --version
 
 Notes:
 
-- The `$env:PATH` change lasts only for the current terminal session — re-run it in each new
-  terminal, or invoke `node.exe` by its full path.
+- The PATH change lasts only for the current terminal session — re-run the script (dot-sourced) in
+  each new terminal, or invoke `node.exe` by its full path.
 - `node` must be on PATH when using the npm scripts (`npm test`, `npm start`), because npm spawns
   `node` as a child process. Without PATH changes, call node directly instead, e.g.
   `& "$env:TEMP\node-portable\node-v22.11.0-win-x64\node.exe" build.mjs`.
